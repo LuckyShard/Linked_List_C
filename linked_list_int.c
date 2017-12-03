@@ -3,6 +3,8 @@
 #include <stdlib.h> /* For malloc and free */
 
 #define MAGIC 271828182
+#define linked_list struct _lli_
+
 
 struct _lli_{
   int value;
@@ -79,6 +81,19 @@ unsigned int lli_push_back(linked_list_int lli, int i){
 unsigned int lli_pop_back(linked_list_int lli){
   if (!lli_check_type(lli))
     return 0;
+  struct _lli_ *cursor = lli -> first_node;
+  struct _lli_ *last = NULL;
+  while(cursor ->next != NULL){
+    last = cursor;
+    cursor = cursor -> next;
+
+  } 
+  if(last != NULL)
+    last->next = NULL;
+  
+  if(cursor == lli -> first_node)
+    lli -> first_node = NULL;
+  free(cursor);
   return 0;
 }
 
@@ -106,6 +121,15 @@ unsigned int lli_size(linked_list_int lli){
  * TODO:
 */
 int lli_find(linked_list_int lli, int element){
+  linked_list *mv = lli->first_node;
+  int cout = 0;
+  while(mv != NULL){
+    if(mv ->value == element)
+      return cout;
+    cout++;
+    mv = mv -> next;
+  }
+
   return -1;
 }
 
@@ -113,13 +137,42 @@ int lli_find(linked_list_int lli, int element){
  * TODO:
  */
 int lli_insert_at(linked_list_int lli, int index, int value){
-  return 0;
+  int i = index;
+  if (!lli_check_type(lli))
+    return 0;
+  struct _lli_ *current_node = lli->first_node;
+  if (index < 0) return -1;
+  while (--i >= 0) {
+    current_node = current_node->next;
+    if (current_node == NULL) return -1;
+  }
+
+  struct _lli_ *new_node = malloc(sizeof(struct _lli_));
+
+  new_node->value = current_node->value;
+  new_node->next = current_node->next;
+  current_node->next = new_node;
+  current_node->value = value;
+
+  return index;
 }
 
 /**
  * TODO:
  */
-int lli_remove_from(linked_list_int lli, int index){
+int lli_remove_from(linked_list_int lli, int val){
+  struct _lli_* cursor = lli -> first_node;
+  while(cursor != NULL){
+    if(cursor -> next ->value == val)
+      break;
+    cursor = cursor -> next;
+  }
+  if(cursor != NULL){
+    struct _lli_* tmp = cursor ->next;
+    cursor -> next = tmp -> next;
+    tmp -> next = NULL;
+    free(tmp);
+  }
   return -1;
 }
 
@@ -142,5 +195,16 @@ double lli_percent_occuped(linked_list_int lli){
  */
 void lli_destroy(linked_list_int lli){
   /* TODO: Apagar todos os nós da lista */
+  struct _lli_ *c = lli -> first_node;
+  struct _lli_ *cursor , *tmp;
+  if(c != NULL){
+    cursor = c -> next;
+    c-> next = NULL;
+    while(cursor != NULL){
+      tmp = cursor -> next;
+      free(cursor);
+      cursor = tmp;
+    }
+  }
   lli->magic=0;
 }
