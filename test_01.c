@@ -21,7 +21,7 @@ int main(){
   printf("Digite o indice no qual deseja inserir o elemento\n");
   scanf("%d",&r1);
   lli_insert_at(l1,r1,el2);
-  printf("Digite um elemento para ser deletado\n");
+  printf("Digite o indice que deseja remover\n");
   scanf("%d",&el1);
   lli_remove_from(l1,el1);
   t = lli_size(l1);
