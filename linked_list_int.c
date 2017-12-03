@@ -162,12 +162,26 @@ int lli_insert_at(linked_list_int lli, int index, int value){
  */
 int lli_remove_from(linked_list_int lli, int val){
   struct _lli_* cursor = lli -> first_node;
+  int flag = 0;
   while(cursor != NULL){
+    if(lli -> first_node ->value == val){
+      /* caso o valor esteja no primeiro nó da lista */
+      flag = 1;
+      struct _lli_ *front = lli -> first_node;
+      lli -> first_node = lli -> first_node -> next;
+      front -> next = NULL;
+      if(front == lli -> first_node){
+        lli -> first_node = NULL;
+      }
+      free(front);
+  
+      break;  
+    }
     if(cursor -> next ->value == val)
       break;
     cursor = cursor -> next;
   }
-  if(cursor != NULL){
+  if(cursor != NULL && flag != 1){
     struct _lli_* tmp = cursor ->next;
     cursor -> next = tmp -> next;
     tmp -> next = NULL;
