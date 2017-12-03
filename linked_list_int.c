@@ -160,12 +160,12 @@ int lli_insert_at(linked_list_int lli, int index, int value){
 /**
  * TODO:
  */
-int lli_remove_from(linked_list_int lli, int val){
+int lli_remove_from(linked_list_int lli, int index){
   struct _lli_* cursor = lli -> first_node;
   int flag = 0;
+  int count = 0;
   while(cursor != NULL){
-    if(lli -> first_node ->value == val){
-      /* caso o valor esteja no primeiro nó da lista */
+    if(index == 0){
       flag = 1;
       struct _lli_ *front = lli -> first_node;
       lli -> first_node = lli -> first_node -> next;
@@ -177,8 +177,9 @@ int lli_remove_from(linked_list_int lli, int val){
   
       break;  
     }
-    if(cursor -> next ->value == val)
+    if(count + 1== index)
       break;
+    count ++;
     cursor = cursor -> next;
   }
   if(cursor != NULL && flag != 1){
@@ -189,7 +190,6 @@ int lli_remove_from(linked_list_int lli, int val){
   }
   return -1;
 }
-
 /**
  * TODO: */
 unsigned int lli_capacity(linked_list_int lli){
