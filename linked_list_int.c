@@ -14,6 +14,7 @@ struct _lli_{
 struct linked_list_int{
   struct _lli_ * first_node;
   int magic;
+  int size;
 };
 
 /* Internal functions */
@@ -36,6 +37,7 @@ linked_list_int lli_create(){
   linked_list_int lli= (linked_list_int)malloc(sizeof(struct linked_list_int));
   lli->first_node = NULL;
   lli->magic = MAGIC;
+  lli -> size = 0;
   return lli;
 }
 
@@ -58,7 +60,7 @@ int lli_get(linked_list_int lli, int index){
 
 /* Adds element 'i' to the end of the linked list */
 unsigned int lli_push_back(linked_list_int lli, int i){
-  if (!lli_check_type(lli))
+ if (!lli_check_type(lli))
     return 0;
   struct _lli_ *new_node = (struct _lli_*) malloc(sizeof(struct _lli_));
   new_node->value=i;
@@ -71,7 +73,8 @@ unsigned int lli_push_back(linked_list_int lli, int i){
       current_node = current_node->next;
     current_node->next=new_node;
   }
-  return 1;
+  return ++lli->size;
+
 }
 
 /* Removes last element of linked list 'lli'
@@ -79,22 +82,27 @@ unsigned int lli_push_back(linked_list_int lli, int i){
  * TODO
  */
 unsigned int lli_pop_back(linked_list_int lli){
-  if (!lli_check_type(lli))
+   if (!lli_check_type(lli))
     return 0;
-  struct _lli_ *cursor = lli -> first_node;
-  struct _lli_ *last = NULL;
-  while(cursor ->next != NULL){
-    last = cursor;
-    cursor = cursor -> next;
+	
+	if (lli->first_node == NULL)
+		return -1;
 
-  } 
-  if(last != NULL)
-    last->next = NULL;
-  
-  if(cursor == lli -> first_node)
-    lli -> first_node = NULL;
-  free(cursor);
-  return 0;
+	if (lli->first_node->next == NULL) {
+		lli->first_node = NULL;
+		return 0;
+	}
+	
+	int i = 0;
+
+	struct _lli_ *current_node = lli->first_node;
+	while (current_node->next->next != NULL) {
+		current_node = current_node->next;
+		i++;
+	}
+	current_node->next = NULL;
+	return --lli->size;
+
 }
 
 
@@ -105,15 +113,8 @@ unsigned int lli_pop_back(linked_list_int lli){
  *
  */
 unsigned int lli_size(linked_list_int lli){
-  if (!lli_check_type(lli))
-    return 0;
-  int size=0;
-  struct _lli_ *current_node = lli->first_node;
-  while (current_node!=NULL){
-    size++;
-    current_node = current_node->next;
-  }
-  return size;
+  
+  return lli->size;
 }
 
 
@@ -153,6 +154,7 @@ int lli_insert_at(linked_list_int lli, int index, int value){
   new_node->next = current_node->next;
   current_node->next = new_node;
   current_node->value = value;
+  lli -> size ++;
 
   return index;
 }
@@ -161,39 +163,36 @@ int lli_insert_at(linked_list_int lli, int index, int value){
  * TODO:
  */
 int lli_remove_from(linked_list_int lli, int index){
-  struct _lli_* cursor = lli -> first_node;
-  int flag = 0;
-  int count = 0;
-  while(cursor != NULL){
-    if(index == 0){
-      flag = 1;
-      struct _lli_ *front = lli -> first_node;
-      lli -> first_node = lli -> first_node -> next;
-      front -> next = NULL;
-      if(front == lli -> first_node){
-        lli -> first_node = NULL;
-      }
-      free(front);
-  
-      break;  
-    }
-    if(count + 1== index)
-      break;
-    count ++;
-    cursor = cursor -> next;
-  }
-  if(cursor != NULL && flag != 1){
-    struct _lli_* tmp = cursor ->next;
-    cursor -> next = tmp -> next;
-    tmp -> next = NULL;
-    free(tmp);
-  }
-  return -1;
+  if (!lli_check_type(lli))
+    return 0;
+	int i = index-1;
+  struct _lli_ *current_node = lli->first_node;
+	struct _lli_ *next_node = lli->first_node;
+
+	if (index < 0) return -1;
+	if (index == 0) {
+		lli->first_node = current_node->next;
+		free (current_node);
+		return index;
+	}
+
+  while (--i >= 0) {
+		current_node = current_node->next;
+		if (current_node == NULL)	return -1;
+	}
+	next_node = current_node->next;
+	current_node->next = current_node->next->next;
+	free (next_node);
+
+	lli->size--;
+	
+  return index;
+
 }
 /**
  * TODO: */
 unsigned int lli_capacity(linked_list_int lli){
-  return 0;
+  return lli->size;
 }
 
 
@@ -208,17 +207,15 @@ double lli_percent_occuped(linked_list_int lli){
  * TODO
  */
 void lli_destroy(linked_list_int lli){
-  /* TODO: Apagar todos os nós da lista */
-  struct _lli_ *c = lli -> first_node;
-  struct _lli_ *cursor , *tmp;
-  if(c != NULL){
-    cursor = c -> next;
-    c-> next = NULL;
-    while(cursor != NULL){
-      tmp = cursor -> next;
-      free(cursor);
-      cursor = tmp;
-    }
-  }
-  lli->magic=0;
+ if (lli_check_type(lli)) {
+  	struct _lli_ *current_node = lli->first_node;
+		struct _lli_ *next_node = lli->first_node;
+  	while (next_node!=NULL){
+			current_node = next_node;
+   	 	next_node = current_node->next;
+			free ( current_node );
+  	}
+  	lli->magic=0;
+	}
+
 }
